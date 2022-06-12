@@ -1,0 +1,72 @@
+<div class="container-fluid">
+  <div class="row">
+    <div
+      {{#page "article"}}
+        {{#if article.show_toc}}
+          class="col-xs-12 col-md-6 offset-md-3 col-xl-8 offset-xl-2"
+        {{else}}
+          class="col-xs-12 col-md-9 offset-md-3 col-xl-10 offset-xl-2"
+        {{/if}}
+      {{else}}
+        class="col-xs-12 col-md-9 offset-md-3 col-xl-10 offset-xl-2"
+      {{/page}}
+    >
+      {{> hdFooter}}
+    </div>
+  </div>
+</div>
+{{> contactModal}}
+
+<script type="text/javascript">
+  $(function() {
+    $('.collapse').collapse({ toggle: false });
+    $('table').addClass('table').addClass('table-responsive').attr('bordercolor', '#eee').attr('border', 0);
+    var $toc = $('#toc');
+    if ($toc.length > 0) {
+      $toc.clone().addClass('side-toc').appendTo('#toc-sidebar-placeholder');
+      $toc.addClass('inline-toc').addClass('hidden-md-up');
+    } else {
+      $('#toc-sidebar-placeholder').remove();
+      $('.col-xs-12.col-md-6.col-xl-8').removeClass('col-md-6 col-xl-8').addClass('col-md-9 col-xl-10')
+    }
+    function setSidebarWidths () {
+      var left_width = $('.left-col').width() - 30;
+      var toc_width = $('.toc-column').width() - 30;
+      $('#sidebar').width(left_width);
+      $('#toc-sidebar-placeholder').width(toc_width);
+      // $('#toc.side-toc').width(width);
+    }
+    setSidebarWidths();
+    function setSidebarHeights () {
+      var $window = $(window);
+      var headerHeight = $('#header').height();
+      var windowHeight = $window.height();
+      var scrollTop = $window.scrollTop();
+      var hasFullyScrolled = scrollTop > headerHeight + 0;
+      var height = hasFullyScrolled
+        ? windowHeight - 100
+        : windowHeight - (100 + (headerHeight - scrollTop));
+      $('#sidebar').height(height);
+      $('#toc-sidebar-placeholder').height(height);
+      // $('#toc.side-toc').height(height);
+      if (hasFullyScrolled) {
+        $('#sidebar').css('top', 50);
+        $('#toc-sidebar-placeholder').css('top', 55);
+        // $('#toc.side-toc').css('top', 50);
+      } else {
+        $('#sidebar').css('top', 55 + (headerHeight - scrollTop));
+        $('#toc-sidebar-placeholder').css('top', 55 + (headerHeight - scrollTop));
+        // $('#toc.side-toc').css('top', 50 + (headerHeight - scrollTop));
+      }
+    }
+    setSidebarHeights();
+    $(window).resize(function () { setSidebarWidths(); setSidebarHeights(); });
+    $(window).scroll(setSidebarHeights);
+    $('#hd-query').on('keydown', function () {
+      setSidebarHeights();
+      setTimeout(setSidebarHeights, 250);
+    });
+    $('#sidebar').show();
+    $('#toc.side-toc').show();
+  });
+</script>

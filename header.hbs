@@ -1,0 +1,170 @@
+<div id="header">
+  <div class="container-fluid">
+    <nav class="navbar navbar-light bg-faded">
+      <a class="navbar-brand" href="{{fallback meta.home_path "/"}}">
+        <span>
+          {{#if config.logo}}
+            <img class="img-responsive logo" src="{{config.logo}}">
+          {{/if}}
+          {{#if config.brand}}
+            <b>{{config.brand}}</b>
+          {{/if}}
+        </span>
+      </a>
+      <div class="spacer"></div>
+      <div class="nav-items">
+        <ul class="nav navbar-nav">
+          {{#if config.nav_items}}
+            {{#each config.nav_items}}
+              <li class="nav-item">
+                <a class="nav-link" href="{{this.href}}" target="{{fallback this.target "_blank"}}">
+                  {{this.title}}
+                </a>
+              </li>
+            {{/each}}
+          {{/if}}
+          {{#if config.statuspage}}
+            <li class="nav-item statuspage">
+              <a class="nav-link" href="#" target="_blank">
+                <span class="color-dot"></span>
+                <span class="color-description"></span>
+              </a>
+            </li>
+          {{/if}}
+          {{#if meta.languages}}
+            <li class="nav-item language-picker">
+              <div class="dropdown show">
+                <a id="lang-dropdown" class="dropdown-toggle nav-link" style="text-transform:uppercase;" href data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{meta.language_code}}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="lang-dropdown">
+                  {{#each meta.languages}}
+                    <a class="dropdown-item" href="{{rootPath meta.home_path}}/l/{{this.code}}" style="color: #444 !important">
+                      {{this.name}}
+                    </a>
+                  {{/each}}
+                </div>
+              </div>
+            </li>
+          {{/if}}
+          <li class="nav-item">
+            {{> contactLink}}
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <div id="search-container" class="container-fluid{{#unless meta.is_home_page}} search-responsive{{/unless}}">
+    <div class="row">
+      <div class="col-xs-12 col-md-6 offset-md-3">
+        <div id="instant-search">
+          <form action="{{rootPath meta.home_path}}/search" method="GET">
+            <input id="hd-query" name="query" placeholder="{{i18n "help_me_with" "Help me with..."}}">
+          </form>
+        </div>
+        <span class="fa fa-search"></span>
+      </div>
+    </div>
+  </div>
+  <div id="searchresults" class="container-fluid">
+    <div id="articles" class="row">
+      <div class="col-xs-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+        <div id="hits"></div>
+      </div>
+    </div>
+  </div>
+  {{#page "categories"}}
+    {{#if meta.top_articles}}
+      <div id="top-articles-container" class="container-fluid">
+        <div class="row">
+          <div class="col-xs-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+            <div class="text-xs-center">
+              <p class="top-articles-label">
+                <i class="fa fa-trophy"></i>
+                {{i18n "top_articles" "Top Articles"}}
+              </p>
+              <p class="top-articles">
+                {{#each meta.top_articles}}
+                  {{#unless (gt @index 2)}}
+                    <span class="top-article">
+                      <a class="article-title-link" href="{{this.relative_url}}">
+                        {{this.title}}
+                      </a>
+                      {{#unless @last}}
+                        {{#unless (gt @index 1)}}
+                          &#8203; | &#8203;
+                        {{/unless}}
+                      {{/unless}}
+                    </span>
+                  {{/unless}}
+                {{/each}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/if}}
+  {{/page}}
+</div>
+
+{{! takes c *models.Category and level int as partial parameters}}
+{{#*inline "sidebar_category"}}
+  <a
+    class="sidebar-category{{#page "category"}}{{#if (eq category.category_id c.category_id)}} current{{/if}}{{/page}}"
+    href="#category-{{c.category_id}}-items"
+    data-toggle="collapse"
+    aria-expanded="false"
+    aria-controls="category-{{c.category_id}}-items"
+  >
+    <p
+      id="category-{{c.category_id}}-title"
+      style="margin-left: {{multiply 0.5 level}}em !important; font-size: {{subtract 1 (multiply 0.05 level)}}em !important;"
+      {{#categoryIsAscendent @root.meta.sidebar_categories category c}}
+        class="expanded"
+      {{/categoryIsAscendent}}
+      onclick="toggleCategoryIcon(event, '{{c.category_id}}')"
+    >
+      {{c.title}}
+    </p>
+  </a>
+  <div
+    id="category-{{c.category_id}}-items"
+    class="collapse{{#categoryIsAscendent @root.meta.sidebar_categories category c}} in {{/categoryIsAscendent}}"
+    data-toggle="collapse"
+  >
+    {{#each (filterCategoriesByParentId @root.meta.sidebar_categories c.category_id)}}
+      {{> sidebar_category c=this level=(add level 1)}}
+    {{/each}}
+    {{#each c.articles}}
+      <a
+        class="sidebar-article{{#page "article"}}{{#if (eq article.article_id this.article_id)}} current{{/if}}{{/page}}"
+        href="{{this.relative_url}}"
+        onclick="window.location.href='{{this.relative_url}}'"
+      >
+        <p style="margin-left: {{multiply 0.5 (add level 1)}}em !important; font-size: {{subtract 1 (multiply 0.05 (add level 1))}} !important;">
+          {{this.title}}
+        </p>
+      </a>
+    {{/each}}
+  </div>
+{{/inline}}
+
+{{#*inline "sidebar"}}
+  <div id="sidebar">
+    {{#each meta.sidebar_categories}}
+      {{#unless this.parent_category_id}}
+        {{> sidebar_category c=this level=0}}
+      {{/unless}}
+    {{/each}}
+  </div>
+  <script>
+    function toggleCategoryIcon (event, category_id) {
+      var $p = $('#category-' + category_id + '-title');
+      if ($p.hasClass('expanded')) {
+        $p.removeClass('expanded');
+      } else {
+        $p.addClass('expanded');
+      }
+    }
+  </script>
+{{/inline}}

@@ -1,0 +1,60 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="hidden-sm-down col-md-3 col-xl-2 left-col">
+      {{> sidebar}}
+    </div>
+    <div class="col-xs-12 col-md-9 col-xl-10">
+      <div id="home" class="container-fluid">
+        <div id="categories" class="row flex-row">
+          {{#each categories}}
+            {{#unless this.parent_category_id}}
+              <div class="col-xs-12 col-sm-6 col-md-4">
+                <a class="card-link" href="{{this.relative_url}}">
+                  <div id="category" class="card hvr-card">
+                    <div class="card-block">
+                      <div class="text-xs-center">
+                        {{#if (hasPrefix this.icon "fa-")}}
+                          <i class="fa fa-3x card-icon {{this.icon}}"></i>
+                        {{else if (hasPrefix this.icon "http")}}
+                          <img class="card-icon" src="{{this.icon}}">
+                        {{/if}}
+                        <h3 class="card-title">{{this.title}}</h3>
+                        <p class="card-text">{{this.description}}</p>
+                        {{#if (gt this.meta.num_authors 0)}}
+                          <p class="card-text">
+                            {{#each this.authors}}
+                              {{#if (lt @index 5)}}
+                                {{#if this.profile_image}}
+                                  <img class="img-fluid img-circle" src="{{this.profile_image}}">
+                                {{/if}}
+                              {{/if}}
+                            {{/each}}
+                            <span class="text-muted">
+                              {{this.meta.num_articles}}
+                              {{#if (eq this.meta.num_articles 1)}}
+                                {{i18n "article" "article"}}
+                              {{else}}
+                                {{i18n "articles" "articles"}}
+                              {{/if}}
+                              {{i18n "by" "by"}}
+                              {{this.meta.num_authors}}
+                              {{#if (eq this.meta.num_authors 1)}}
+                                {{i18n "author" "author"}}
+                              {{else}}
+                                {{i18n "authors" "authors"}}
+                              {{/if}}
+                            </span>
+                          </p>
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            {{/unless}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

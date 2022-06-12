@@ -1,0 +1,49 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="hidden-sm-down col-md-3 col-xl-2 left-col">
+      {{> sidebar}}
+    </div>
+    <div class="col-xs-12 col-md-9 col-xl-10">
+      <div id="searchresults" data-search-term="{{fallback search_term "undefined"}}">
+        <div id="articles" class="row">
+          <div class="col-xs-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+            {{#each articles}}
+              <div class="row">
+                <div class="col-xs">
+                  <a class="card-link" data-article-id="{{this.article_id}}" href="{{this.relative_url}}">
+                    <div id="article" class="card hvr-card">
+                      <div class="card-block">
+                        <h3 class="card-title">{{this.title}}</h3>
+                        <p class="card-description">{{this.description}}</p>
+                        {{#if this.updated_at_relative}}
+                          {{#if this.search.score}}
+                            <p class="card-meta text-muted">
+                              {{i18n "updated" "Updated"}} {{this.updated_at_relative}}
+                              <span class="pull-right">
+                                {{this.search.score}}%
+                                {{i18n "relevance" "relevance"}}
+                            </p>
+                          {{/if}}
+                        {{/if}}
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            {{/each}}
+            {{#unless articles}}
+              <div class="text-xs-center">
+                <p class="lead">&nbsp;</p>
+                <i class="fa fa-3x fa-times-circle text-muted"></i>
+                <p class="lead">
+                  {{i18n "no_articles_found" "We couldn't find any articles matching"}}
+                  <b>{{original_search_term}}</b>
+                </p>
+              </div>
+            {{/unless}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

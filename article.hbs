@@ -1,0 +1,131 @@
+<style>
+  #toc::before {
+    content: '{{i18n "table_of_contents" "Table of Contents"}}' !important;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="hidden-sm-down col-md-3 col-xl-2 left-col">
+      {{> sidebar}}
+    </div>
+    <div
+      {{#if article.show_toc}}
+        class="col-xs-12 col-md-6 col-xl-8"
+      {{else}}
+        class="col-xs-12 col-md-9 col-xl-10"
+      {{/if}}
+    >
+      <div id="article">
+        <div id="meta" class="row">
+          <div class="col-xs-10 offset-xs-1">
+            <p id="breadcrumbs">
+              <a href="{{fallback meta.home_path "/"}}">
+                {{i18n "all_categories" "All Categories"}}
+              </a>
+              &#8203;>&#8203;
+              {{> categoryBreadcrumbs linkify=true}}
+              &#8203;>&#8203;
+              {{#if category.icon}}
+                <i class="fa breadcrumb-icon fa-file-text{{#if (hasSuffix category.icon "-o")}}-o{{/if}}"></i>
+              {{/if}}
+              {{article.title}}
+            </p>
+          </div>
+        </div>
+        <div id="body" class="row">
+          <div class="col-xs-12">
+            <div class="card{{#if article.show_toc}} responsive-toc{{/if}}">
+              <div class="card-block">
+                <h1 class="card-title">{{article.title}}</h1>
+                <p class="card-text meta">
+                  {{#if article.author.profile_image}}
+                    <img class="img-fluid img-circle" src="{{article.author.profile_image}}">
+                  {{/if}}
+                  {{#if article.author.name}}
+                    <span class="text-muted">
+                      {{i18n "updated" "Updated"}} {{article.updated_at_relative}}
+                      {{i18n "by" "by"}}
+                      {{article.author.name}}
+                    </span>
+                  {{/if}}
+                </p>
+                {{{article.body}}}
+              </div>
+              <hr/>
+              <div id="feedback" class="card-block" data-thanks="{{i18n "got_it" "Got it!"}}">
+                <h3>{{i18n "how_did_we_do" "How did we do?"}}</h3>
+                <div class="btn-group" role='group' aria-label='Feedback'>
+                  <button class="feedback-positive btn btn-link" type='button'>
+                    <i class="fa fa-2x fa-smile-o hvr-back-pulse"></i>
+                  </button>
+                  <button class="feedback-neutral btn btn-link" type='button'>
+                    <i class="fa fa-2x fa-meh-o hvr-back-pulse"></i>
+                  </button>
+                  <button class="feedback-negative btn btn-link" type='button'>
+                    <i class="fa fa-2x fa-frown-o hvr-back-pulse"></i>
+                  </button>
+                </div>
+              </div>
+              {{#if meta.related_articles}}
+                <hr/>
+                <div id="related" class="card-block">
+                  <h3>{{i18n "related_articles" "Related Articles"}}
+                  <ul>
+                    {{#each meta.related_articles}}
+                      <li>
+                        <a href="{{this.relative_url}}">{{this.title}}</a>
+                      </li>
+                    {{/each}}
+                  </ul>
+                </div>
+              {{/if}}
+              {{#featureGate "integrations"}}
+                {{#if config.disqus_shortname}}
+                  <hr/>
+                  <!-- Disqus -->
+                  <div id="disqus_thread"></div>
+                  <script>
+                    var disqus_config = function () {
+                        this.page.url = "{{meta.canonical}}";
+                        this.page.identifier = "article-{{article.article_id}}";
+                    };
+                    (function() {
+                        var d = document, s = d.createElement('script');
+
+                        s.src = 'https://{{config.disqus_shortname}}.disqus.com/embed.js';
+
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                  </script>
+                  <noscript>
+                    |Please enable JavaScript to view the &#8203;
+                    a(href="https://disqus.com/?ref_noscript", rel="nofollow") comments powered by Disqus.
+                  </noscript>
+                {{/if}}
+              {{/featureGate}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{#if article.show_toc}}
+      <div class="hidden-sm-down col-md-3 col-xl-2 toc-column">
+        <div id="toc-sidebar-placeholder"></div>
+      </div>
+    {{/if}}
+  </div>
+</div>
+
+{{! HACK: Fix weird spacing in `pre` tags }}
+<script>
+  (function() {
+    $(function() {
+      $('#article pre').each(function(i, el) {
+        $el = $(el);
+        $el.html($el.html().replace(/\n\s{10}/gi, '\n'));
+      });
+    });
+  })();
+</script>
